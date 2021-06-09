@@ -11,7 +11,6 @@ namespace CustomerModule.Check
             int age = DateTime.Now.Year - dob.Year;
             if (DateTime.Now.DayOfYear < dob.DayOfYear)
                 age--;
-            /*return base.IsValid(value);*/
             return age >= 18;
         }
     }

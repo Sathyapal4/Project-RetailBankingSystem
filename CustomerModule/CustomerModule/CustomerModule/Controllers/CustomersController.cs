@@ -1,6 +1,5 @@
 ﻿using CustomerModule.Models;
 using CustomerModule.CustomersRepository;
-using log4net;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,12 +13,11 @@ namespace CustomerModule.Controllers
     [Authorize(Roles = "Employee")]
     public class CustomersController : ControllerBase
     {
-        private readonly ICustomerRepository _customerRepository;
-        private readonly ILog _logger = LogManager.GetLogger(typeof(CustomersController));
+        private readonly ICustomerRepository newCustomerRepository;
 
         public CustomersController(ICustomerRepository customerRepository)
         {
-            _customerRepository = customerRepository;
+            newCustomerRepository = customerRepository;
         }
 
         [HttpGet]
@@ -28,16 +26,15 @@ namespace CustomerModule.Controllers
         {
             try
             {
-                _logger.Info("Get All Customers Called in Customers Controller");
-                List<Customer> customers = _customerRepository.GetAllCustomers();
+                List<Customer> customers = newCustomerRepository.GetAllCustomers();
                 if (customers == null)
                     return NotFound();
                 return Ok(customers);
             }
             catch (Exception e)
             {
-                _logger.Error(e.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error while fetching customer");
+                throw e;
             }
         }
 
@@ -47,16 +44,16 @@ namespace CustomerModule.Controllers
         {
             try
             {
-                _logger.Info("Get Customer Details Called in Customer Controller");
-                Customer customer = _customerRepository.GetCustomerDetails(customer_Id);
+                Customer customer = newCustomerRepository.GetCustomerDetails(customer_Id);
                 if (customer == null)
                     return NotFound("Customer with this Id is not exist");
                 return Ok(customer);
             }
             catch (Exception e)
             {
-                _logger.Error(e.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error while fetching customer");
+                throw e;
+            
             }
         }
 
@@ -66,11 +63,10 @@ namespace CustomerModule.Controllers
         {
             try
             {
-                _logger.Info("Create Customer Called in Customer Controller");
 
                 if (!ModelState.IsValid)
                     return BadRequest("Customer Data is not proper");
-                CustomerCreationStatus customerCreationStatus = _customerRepository.CreateCustomer(customer);
+                CustomerCreationStatus customerCreationStatus = newCustomerRepository.CreateCustomer(customer);
                 if (customerCreationStatus.CustomerId != null)
                     return StatusCode(StatusCodes.Status201Created, customerCreationStatus);
                 else
@@ -78,8 +74,8 @@ namespace CustomerModule.Controllers
             }
             catch (Exception e)
             {
-                _logger.Error(e.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error while fetching customer");
+                throw e;
             }
         }
 
@@ -90,18 +86,17 @@ namespace CustomerModule.Controllers
         {
             try
             {
-                _logger.Info("Check Customer Credentials Called in Customer Controller");
                 if (!ModelState.IsValid)
                     return BadRequest("Invalid Email And Password");
-                CustomerResponse result = _customerRepository.GetCustomer(customerRequest);
+                CustomerResponse result = newCustomerRepository.GetCustomer(customerRequest);
                 if (result != null)
                     return Ok(result);
                 return BadRequest("Invalid Email And Password");
             }
             catch (Exception e)
             {
-                _logger.Error(e.Message);
-                return StatusCode(StatusCodes.Status500InternalServerError, "Try Again After some Time");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Try again later");
+                throw e;
             }
         }
     }

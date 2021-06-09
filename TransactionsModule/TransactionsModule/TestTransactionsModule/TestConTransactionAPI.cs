@@ -65,7 +65,7 @@ namespace TransactionsModule.Tests
         public void PostMethodTransfer()
         {
             var mock = new Mock<ITransactionRepository>();
-            Transfer transfer = new Transfer { Source_AccountId = 1, Amount = 12000, Target_AccountId = 3 };
+            Transfer transfer = new Transfer { SourceAccountId = 1, Amount = 12000, DestinationAccountId = 3 };
             mock.Setup(c => c.Transfer(transfer)).Returns(new Ref_Transaction_Status { Trans_Status_Code = 1, Trans_Status_Description = Trans_Status_Description.Completed });
             var controller = new TransactionController(mock.Object);
             var result = controller.Transfer(transfer) as ObjectResult;
