@@ -8,6 +8,7 @@ namespace TransactionsModule.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Counterparty_ID { get; set; }
+
         public string Other_Details { get; set; }
     }
 }

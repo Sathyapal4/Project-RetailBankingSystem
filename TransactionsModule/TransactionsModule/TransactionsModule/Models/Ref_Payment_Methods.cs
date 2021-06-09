@@ -8,6 +8,7 @@ namespace TransactionsModule.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Payment_Method_Code { get; set; }
+
         public Payment_Method_Name Payment_Method_Name { get; set; }
     }
 }

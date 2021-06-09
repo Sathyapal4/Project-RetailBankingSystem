@@ -10,26 +10,29 @@ namespace TransactionsModule.TransactionsRepository
 {
     public class TransactionRepository : ITransactionRepository
     {
-        private readonly TransactionDbContext _context;
-        private readonly IAccountService _accountService;
-        private readonly ILog _logger = LogManager.GetLogger(typeof(TransactionRepository));
+        private readonly TransactionDbContext newContext;
+        private readonly IAccountService newAccountService;
 
         public TransactionRepository(TransactionDbContext context, IAccountService accountService)
         {
-            _context = context;
-            _accountService = accountService;
+            newContext = context;
+            newAccountService = accountService;
         }
+
+
+        //Call the deposit action of Account Microservice and pass account object
         public Ref_Transaction_Status Deposit(Account account)
         {
             try
             {
-                _logger.Info("Deposit Method called in Transaction Repository");
-                //call deposit action of Account Microservice and pass Acc object
-                AmountResponse response = _accountService.Deposit(account);
+                
+
+
+                AmountResponse response = newAccountService.Deposit(account);
                 Ref_Transaction_Status ref_Transaction_Status;
                 if (response.Success)
                 {
-                    _context.Financial_Transactions.Add(
+                    newContext.Financial_Transactions.Add(
                         new Financial_Transaction
                         {
                             Account_ID = account.AccountId,
@@ -51,7 +54,7 @@ namespace TransactionsModule.TransactionsRepository
                 }
                 else
                 {
-                    _context.Financial_Transactions.Add(
+                    newContext.Financial_Transactions.Add(
                        new Financial_Transaction
                        {
                            Account_ID = account.AccountId,
@@ -71,13 +74,12 @@ namespace TransactionsModule.TransactionsRepository
                     };
 
                 }
-                _context.SaveChanges();
+                newContext.SaveChanges();
                 return ref_Transaction_Status;
             }
             catch (Exception e)
             {
-                _logger.Error(e.Message);
-                throw;
+                throw e;
             }
         }
 
@@ -85,13 +87,12 @@ namespace TransactionsModule.TransactionsRepository
         {
             try
             {
-                _logger.Info("Withdraw Method called in Transaction Repository");
                 //call Withdraw action of Account Microservice and pass Acc object
-                AmountResponse response = _accountService.WithDraw(account);
+                AmountResponse response = newAccountService.WithDraw(account);
                 Ref_Transaction_Status ref_Transaction_Status = null;
                 if (response.Success)
                 {
-                    _context.Financial_Transactions.Add(
+                    newContext.Financial_Transactions.Add(
                         new Financial_Transaction
                         {
                             Account_ID = account.AccountId,
@@ -113,7 +114,7 @@ namespace TransactionsModule.TransactionsRepository
                 }
                 else
                 {
-                    _context.Financial_Transactions.Add(
+                    newContext.Financial_Transactions.Add(
                        new Financial_Transaction
                        {
                            Account_ID = account.AccountId,
@@ -133,13 +134,12 @@ namespace TransactionsModule.TransactionsRepository
                     };
 
                 }
-                _context.SaveChanges();
+                newContext.SaveChanges();
                 return ref_Transaction_Status;
             }
             catch (Exception e)
             {
-                _logger.Error(e.Message);
-                throw;
+                throw e;
             }
         }
 
@@ -147,22 +147,21 @@ namespace TransactionsModule.TransactionsRepository
         {
             try
             {
-                _logger.Info("Transfer Method called in Transaction Repository");
                 Ref_Transaction_Status ref_Transaction_Status = null;
-                bool success = _accountService.GetAccountId(transfer.Target_AccountId);
+                bool success = newAccountService.GetAccountId(transfer.DestinationAccountId);
                 if (success == false)
                     return null;
                 //Call Withdraw microservice for rules
-                AmountResponse response = _accountService.WithDraw(new Account { AccountId = transfer.Source_AccountId, Amount = transfer.Amount });
+                AmountResponse response = newAccountService.WithDraw(new Account { AccountId = transfer.SourceAccountId, Amount = transfer.Amount });
                 if (response.Success)
                 {
-                    AmountResponse response1 = _accountService.Deposit(new Account { AccountId = transfer.Target_AccountId, Amount = transfer.Amount });
+                    AmountResponse response1 = newAccountService.Deposit(new Account { AccountId = transfer.DestinationAccountId, Amount = transfer.Amount });
                     if (response1.Success)
                     {
-                        _context.Financial_Transactions.Add(
+                        newContext.Financial_Transactions.Add(
                         new Financial_Transaction
                         {
-                            Account_ID = transfer.Source_AccountId,
+                            Account_ID = transfer.SourceAccountId,
                             Counterparty_ID = 1,
                             Payment_Method_Code = 1,
                             Service_ID = 1,
@@ -172,10 +171,10 @@ namespace TransactionsModule.TransactionsRepository
                             Amount_of_Transaction = transfer.Amount
                         }
                         );
-                        _context.Financial_Transactions.Add(
+                        newContext.Financial_Transactions.Add(
                         new Financial_Transaction
                         {
-                            Account_ID = transfer.Target_AccountId,
+                            Account_ID = transfer.DestinationAccountId,
                             Counterparty_ID = 1,
                             Payment_Method_Code = 1,
                             Service_ID = 1,
@@ -194,10 +193,10 @@ namespace TransactionsModule.TransactionsRepository
                 }
                 else
                 {
-                    _context.Financial_Transactions.Add(
+                    newContext.Financial_Transactions.Add(
                        new Financial_Transaction
                        {
-                           Account_ID = transfer.Source_AccountId,
+                           Account_ID = transfer.SourceAccountId,
                            Counterparty_ID = 1,
                            Payment_Method_Code = 1,
                            Service_ID = 1,
@@ -207,10 +206,10 @@ namespace TransactionsModule.TransactionsRepository
                            Amount_of_Transaction = transfer.Amount
                        }
                        );
-                    _context.Financial_Transactions.Add(
+                    newContext.Financial_Transactions.Add(
                        new Financial_Transaction
                        {
-                           Account_ID = transfer.Target_AccountId,
+                           Account_ID = transfer.DestinationAccountId,
                            Counterparty_ID = 1,
                            Payment_Method_Code = 1,
                            Service_ID = 1,
@@ -226,13 +225,12 @@ namespace TransactionsModule.TransactionsRepository
                         Trans_Status_Description = Trans_Status_Description.Disputed
                     };
                 }
-                _context.SaveChanges();
+                newContext.SaveChanges();
                 return ref_Transaction_Status;
             }
             catch (Exception e)
             {
-                _logger.Error(e.Message);
-                throw;
+                throw e;
             }
         }
 
@@ -241,8 +239,7 @@ namespace TransactionsModule.TransactionsRepository
         {
             try
             {
-                _logger.Info("Get Transaction Method called in Transaction Repository");
-                List<Financial_Transaction> financial_Transactions = _context.Financial_Transactions.Where(c => c.Account_ID == accountId)
+                List<Financial_Transaction> financial_Transactions = newContext.Financial_Transactions.Where(c => c.Account_ID == accountId)
                                                                                                     .Include(c => c.Ref_Payment_Methods)
                                                                                                     .Include(c => c.Ref_Transaction_Status)
                                                                                                     .Include(c => c.Ref_Transaction_Types)
@@ -251,8 +248,7 @@ namespace TransactionsModule.TransactionsRepository
             }
             catch (Exception e)
             {
-                _logger.Error(e.Message);
-                throw;
+                throw e;
             }
         }
     }

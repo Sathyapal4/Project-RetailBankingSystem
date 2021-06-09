@@ -102,8 +102,8 @@ namespace TransactionsModule.Tests
         {
             Transfer transfer = new Transfer()
             {
-                Source_AccountId = sourceid,
-                Target_AccountId = targetid,
+                SourceAccountId = sourceid,
+                DestinationAccountId = targetid,
                 Amount = amount
             };
 

@@ -10,7 +10,5 @@ namespace TransactionsModule.Models
         public int Trans_Status_Code { get; set; }
         public Trans_Status_Description Trans_Status_Description { get; set; }
     }
-    //Successful
-    //Error
-    //Denied
+    
 }

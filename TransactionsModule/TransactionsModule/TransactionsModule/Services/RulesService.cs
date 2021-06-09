@@ -11,26 +11,24 @@ namespace TransactionsModule.Services
 {
     public class RulesService : IRulesService
     {
-        private readonly IConfiguration _configuration;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly ILog _logger = LogManager.GetLogger(typeof(RulesService));
+        private readonly IConfiguration newConfiguration;
+        private readonly IHttpContextAccessor newHttpContextAccessor;
 
         public RulesService(IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
-            _configuration = configuration;
-            _httpContextAccessor = httpContextAccessor;
+            newConfiguration = configuration;
+            newHttpContextAccessor = httpContextAccessor;
         }
 
         public RuleStatus CheckMinimumBalance(Account account)
         {
             try
             {
-                _logger.Info("Checking Minimum Balance");
                 using (HttpClient _client = new HttpClient())
                 {
                     StringValues token;
-                    _httpContextAccessor.HttpContext.Request.Headers.TryGetValue("Authorization", out token);
-                    _client.BaseAddress = new Uri(_configuration["BaseUrl:Rules"]);
+                    newHttpContextAccessor.HttpContext.Request.Headers.TryGetValue("Authorization", out token);
+                    _client.BaseAddress = new Uri(newConfiguration["BaseUrl:Rules"]);
                     _client.DefaultRequestHeaders.Add("Authorization", token.ToString());
                     HttpResponseMessage responseMessage = _client.GetAsync($"api/rules/EvaluateMinBalance/{account.AccountId}").Result;
                     if (responseMessage.IsSuccessStatusCode)
@@ -43,8 +41,7 @@ namespace TransactionsModule.Services
             }
             catch (Exception e)
             {
-                _logger.Error(e.Message);
-                throw;
+                throw e;
             }
         }
     }

@@ -12,28 +12,27 @@ namespace TransactionsModule.Services
 {
     public class AccountService : IAccountService
     {
-        private readonly IConfiguration _configuration;
-        private readonly IRulesService _rulesService;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly ILog _logger = LogManager.GetLogger(typeof(AccountService));
+        private readonly IConfiguration newConfiguration;
+        private readonly IRulesService newRulesService;
+        private readonly IHttpContextAccessor newHttpContextAccessor;
 
         public AccountService(IConfiguration configuration, IRulesService rulesService, IHttpContextAccessor httpContextAccessor)
         {
-            _configuration = configuration;
-            _rulesService = rulesService;
-            _httpContextAccessor = httpContextAccessor;
+            newConfiguration = configuration;
+            newRulesService = rulesService;
+            newHttpContextAccessor = httpContextAccessor;
         }
 
+        //Deposit method in Account Service
         public AmountResponse Deposit(Account account)
         {
             try
             {
-                _logger.Info("Deposit method called in account service");
                 using (HttpClient _client = new HttpClient())
                 {
                     StringValues token;
-                    _httpContextAccessor.HttpContext.Request.Headers.TryGetValue("Authorization", out token);
-                    _client.BaseAddress = new Uri(_configuration["BaseUrl:Account"]);
+                    newHttpContextAccessor.HttpContext.Request.Headers.TryGetValue("Authorization", out token);
+                    _client.BaseAddress = new Uri(newConfiguration["BaseUrl:Account"]);
                     _client.DefaultRequestHeaders.Add("Authorization", token.ToString());
                     var stringPayload = JsonConvert.SerializeObject(account);
                     var payload = new StringContent(stringPayload, Encoding.UTF8, "application/json");
@@ -48,24 +47,26 @@ namespace TransactionsModule.Services
             }
             catch (Exception e)
             {
-                _logger.Error(e.Message);
-                throw;
+                throw e;
             }
         }
+
+        //Withdraw
         public AmountResponse WithDraw(Account account)
         {
             try
             {
-                //RuleService
-                _logger.Info("Withdraw method called in account service");
-                RuleStatus ruleStatus = _rulesService.CheckMinimumBalance(account);
+
+                //RulesService
+
+                RuleStatus ruleStatus = newRulesService.CheckMinimumBalance(account);
                 if (ruleStatus.Status == Status.Denied)
                     return new AmountResponse { Message = "Balance is Less Than Minimum Balance", Success = false };
                 using (HttpClient _client = new HttpClient())
                 {
                     StringValues token;
-                    _httpContextAccessor.HttpContext.Request.Headers.TryGetValue("Authorization", out token);
-                    _client.BaseAddress = new Uri(_configuration["BaseUrl:Account"]);
+                    newHttpContextAccessor.HttpContext.Request.Headers.TryGetValue("Authorization", out token);
+                    _client.BaseAddress = new Uri(newConfiguration["BaseUrl:Account"]);
                     _client.DefaultRequestHeaders.Add("Authorization", token.ToString());
                     var stringPayload = JsonConvert.SerializeObject(account);
                     var payload = new StringContent(stringPayload, Encoding.UTF8, "application/json");
@@ -80,21 +81,22 @@ namespace TransactionsModule.Services
             }
             catch (Exception e)
             {
-                _logger.Error(e.Message);
-                throw;
+                throw e;
             }
         }
 
+
+
+        //getAccountId
         public bool GetAccountId(int accountId)
         {
             try
             {
-                _logger.Info("GetAccountId method called in account service");
                 using (HttpClient _client = new HttpClient())
                 {
                     StringValues token;
-                    _httpContextAccessor.HttpContext.Request.Headers.TryGetValue("Authorization", out token);
-                    _client.BaseAddress = new Uri(_configuration["BaseUrl:Account"]);
+                    newHttpContextAccessor.HttpContext.Request.Headers.TryGetValue("Authorization", out token);
+                    _client.BaseAddress = new Uri(newConfiguration["BaseUrl:Account"]);
                     _client.DefaultRequestHeaders.Add("Authorization", token.ToString());
                     HttpResponseMessage responseMessage = _client.GetAsync("api/Account/GetAccount/" + accountId).Result;
                     if (responseMessage.IsSuccessStatusCode)
@@ -106,8 +108,7 @@ namespace TransactionsModule.Services
             }
             catch (Exception e)
             {
-                _logger.Error(e.Message);
-                throw;
+                throw e;
             }
         }
     }

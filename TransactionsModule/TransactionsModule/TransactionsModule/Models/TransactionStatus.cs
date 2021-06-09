@@ -3,7 +3,7 @@
     public class TransactionStatus
     {
         public string Message { get; set; }
-        public double Source_Balance { get; set; }
-        public double Destination_Balance { get; set; }
+        public double SourceBalance { get; set; }
+        public double DestinationBalance { get; set; }
     }
 }
