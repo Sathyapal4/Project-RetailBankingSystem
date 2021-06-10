@@ -6,9 +6,9 @@ using System.Transactions;
 
 namespace AccountManagementModule.Models
 {
-    public partial class AccountDbContext:DbContext
+    public partial class AccountDBContext:DbContext
     {
-        public AccountDbContext(DbContextOptions<AccountDbContext> options) : base(options)
+        public AccountDBContext(DbContextOptions<AccountDBContext> options) : base(options)
         {
 
         }

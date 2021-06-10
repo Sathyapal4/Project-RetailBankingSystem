@@ -1,5 +1,4 @@
 ﻿using AccountManagementModule.Models;
-using log4net;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -10,30 +9,27 @@ namespace AccountManagementModule.AccountsRepository
 {
     public class AccountRepository : IAccountRepository
     {
-        private readonly AccountDbContext _context;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly ILog _logger = LogManager.GetLogger(typeof(AccountRepository));
+        private readonly AccountDBContext newContext;
+        private readonly IHttpContextAccessor newHttpContextAccessor;
 
-        public AccountRepository(AccountDbContext context, IHttpContextAccessor httpContextAccessor)
+        public AccountRepository(AccountDBContext context, IHttpContextAccessor httpContextAccessor)
         {
-            _context = context;
-            _httpContextAccessor = httpContextAccessor;
+            newContext = context;
+            newHttpContextAccessor = httpContextAccessor;
         }
 
         public bool CreateAccount(int customerId)
         {
             try
             {
-                _logger.Info("Create Account of Account Repository Called ");
-                _context.Accounts.Add(new Account() { AccountType = AccountType.Saving, Balance = 0, CustomerId = customerId });
-                _context.Accounts.Add(new Account() { AccountType = AccountType.Current, Balance = 0, CustomerId = customerId });
-                _context.SaveChanges();
+                newContext.Accounts.Add(new Account() { AccountType = AccountType.Saving, Balance = 0, CustomerId = customerId });
+                newContext.Accounts.Add(new Account() { AccountType = AccountType.Current, Balance = 0, CustomerId = customerId });
+                newContext.SaveChanges();
                 return true;
             }
             catch (Exception e)
             {
-                _logger.Error(e.Message);
-                throw;
+                throw e;
             }
         }
 
@@ -41,14 +37,12 @@ namespace AccountManagementModule.AccountsRepository
         {
             try
             {
-                _logger.Info("Get Customer Accounts of Account Repository Called ");
-                List<Account> accounts = _context.Accounts.Where(c => c.CustomerId == customerId).ToList();
+                List<Account> accounts = newContext.Accounts.Where(c => c.CustomerId == customerId).ToList();
                 return accounts;
             }
             catch (Exception e)
             {
-                _logger.Error(e.Message);
-                throw;
+                throw e;
             }
         }
 
@@ -56,58 +50,55 @@ namespace AccountManagementModule.AccountsRepository
         {
             try
             {
-                _logger.Info("Get Account of Account Repository Called ");
-                Account account = _context.Accounts.Where(c => c.AccountId == accountId).SingleOrDefault();
+                Account account = newContext.Accounts.Where(c => c.AccountId == accountId).SingleOrDefault();
                 return account;
             }
             catch (Exception e)
             {
-                _logger.Error(e.Message);
-                throw;
+                throw e;
             }
         }
 
 
-        public bool Deposit(AmountRequest amountRequest)
+        public bool Deposit(InputAmountFromUser amountClass)
         {
             try
             {
-                _logger.Info("Deposit of Account Repository Called ");
-                Account acc = _context.Accounts.FirstOrDefault(a => a.AccountId == amountRequest.AccountId);
-                acc.Balance += amountRequest.Amount;
-                _context.TransactionStatuses.Add(new TransactionStatus() { AccountId = amountRequest.AccountId, Message = "Success", currentBalance = acc.Balance });
-                _context.Statements.Add(new Statement() { AccountId = amountRequest.AccountId, Date = DateTime.Now, Narration = amountRequest.Narration, Deposit = amountRequest.Amount, Withdrawal = 0, ClosingBalance = acc.Balance, RefNo = $"Ref_No_{amountRequest.AccountId}_{DateTime.Now.ToShortDateString()}", ValueDate = DateTime.Now });
-                _context.SaveChanges();
+                Account acc = newContext.Accounts.FirstOrDefault(a => a.AccountId == amountClass.AccountId);
+                acc.Balance += amountClass.Amount;
+                newContext.TransactionStatuses.Add(new TransactionStatus() { AccountId = amountClass.AccountId, Message = "Success", currentBalance = acc.Balance });
+                newContext.Statements.Add(new Statement() { AccountId = amountClass.AccountId, Date = DateTime.Now, Narration = amountClass.Narration, Deposit = amountClass.Amount, Withdrawal = 0, ClosingBalance = acc.Balance, RefNo = $"Ref_No_{amountClass.AccountId}_{DateTime.Now.ToShortDateString()}", ValueDate = DateTime.Now });
+                newContext.SaveChanges();
                 return true;
             }
             catch (Exception e)
             {
-                _logger.Error(e.Message);
-                throw;
+                throw e;
             }
         }
 
-        public bool Withdraw(AmountRequest amountRequest)
+        public bool Withdraw(InputAmountFromUser amountClass)
         {
             try
             {
-                _logger.Info("Withdraw of Account Repository Called ");
-                int customerId = int.Parse(_httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
-                Account acc = _context.Accounts.FirstOrDefault(a => a.AccountId == amountRequest.AccountId && customerId == a.CustomerId);
+                // int customerId = int.Parse(newHttpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
+               // int customerId = 3;
+                
+                Account acc = newContext.Accounts.FirstOrDefault(a => a.AccountId == amountClass.AccountId /*&& customerId == a.CustomerId*/);
+                
                 if (acc == null)
                     return false;
-                if ((acc.Balance - amountRequest.Amount) < 0)
+                if ((acc.Balance - amountClass.Amount) < 0)
                     return false;
-                acc.Balance -= amountRequest.Amount;
-                _context.TransactionStatuses.Add(new TransactionStatus() { AccountId = amountRequest.AccountId, Message = "Success", currentBalance = acc.Balance });
-                _context.Statements.Add(new Statement() { AccountId = amountRequest.AccountId, Date = DateTime.Now, Narration = amountRequest.Narration, Deposit = 0, Withdrawal = amountRequest.Amount, ClosingBalance = acc.Balance, RefNo = $"Ref_No_{amountRequest.AccountId}_{DateTime.Now.ToShortDateString()}", ValueDate = DateTime.Now });
-                _context.SaveChanges();
+                acc.Balance -= amountClass.Amount;
+                newContext.TransactionStatuses.Add(new TransactionStatus() { AccountId = amountClass.AccountId, Message = "Success", currentBalance = acc.Balance });
+                newContext.Statements.Add(new Statement() { AccountId = amountClass.AccountId, Date = DateTime.Now, Narration = amountClass.Narration, Deposit = 0, Withdrawal = amountClass.Amount, ClosingBalance = acc.Balance, RefNo = $"Ref_No_{amountClass.AccountId}_{DateTime.Now.ToShortDateString()}", ValueDate = DateTime.Now });
+                newContext.SaveChanges();
                 return true;
             }
             catch (Exception e)
             {
-                _logger.Error(e.Message);
-                throw;
+                throw e;
             }
         }
 
@@ -115,7 +106,6 @@ namespace AccountManagementModule.AccountsRepository
         {
             try
             {
-                _logger.Info("Get Statement of Account Repository Called ");
                 DateTime fromDate;
                 DateTime toDate;
                 if (from_date != null && to_date != null)
@@ -128,13 +118,12 @@ namespace AccountManagementModule.AccountsRepository
                     fromDate = DateTime.Now.AddMonths(-1);
                     toDate = DateTime.Now.AddDays(1);
                 }
-                List<Statement> statements = _context.Statements.Where(c => c.Date >= fromDate && c.Date <= toDate && c.AccountId == accountId).ToList();
+                List<Statement> statements = newContext.Statements.Where(c => c.Date >= fromDate && c.Date <= toDate && c.AccountId == accountId).ToList();
                 return statements;
             }
             catch (Exception e)
             {
-                _logger.Error(e.Message);
-                throw;
+                throw e;
             }
         }
 

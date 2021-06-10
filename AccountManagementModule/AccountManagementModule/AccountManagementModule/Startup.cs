@@ -44,7 +44,7 @@ namespace AccountManagementModule
            // services.AddTransient<IAccountProvider, AccountProvider>();
 
 
-            services.AddDbContext<AccountDbContext>(options =>
+            services.AddDbContext<AccountDBContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
 
@@ -69,7 +69,7 @@ namespace AccountManagementModule
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JWT:SecretKey"])),
                     };
                 });
-            //  services.AddDbContext<AccountDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            //  services.AddDbContext<AccountDBContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             //   services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddHttpContextAccessor();
          //   services.AddControllers();

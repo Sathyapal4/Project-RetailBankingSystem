@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AccountManagementModule.Migrations
 {
-    [DbContext(typeof(AccountDbContext))]
+    [DbContext(typeof(AccountDBContext))]
     partial class AccountDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
