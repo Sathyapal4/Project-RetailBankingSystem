@@ -10,7 +10,7 @@ namespace CustomerModule.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = "Employee")]
+  //  [Authorize(Roles = "Employee")]
     public class CustomersController : ControllerBase
     {
         private readonly ICustomerRepository newCustomerRepository;
@@ -65,7 +65,7 @@ namespace CustomerModule.Controllers
             {
 
                 if (!ModelState.IsValid)
-                    return BadRequest("Customer Data is not proper");
+                    return BadRequest("Improper Customer Data");
                 CustomerCreationStatus customerCreationStatus = newCustomerRepository.CreateCustomer(customer);
                 if (customerCreationStatus.CustomerId != null)
                     return StatusCode(StatusCodes.Status201Created, customerCreationStatus);
