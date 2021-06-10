@@ -54,7 +54,7 @@ namespace AccountAPI.Tests
             var result = controller.GetAccount(id) as ObjectResult;
             Assert.AreEqual(result.StatusCode, 200);
             Assert.IsNotNull(result.Value);
-            var model = result.Value as Account;//List<Account>;
+            var model = result.Value as Account;
             Assert.AreEqual(1, model.AccountId);
         }
         [Test]
