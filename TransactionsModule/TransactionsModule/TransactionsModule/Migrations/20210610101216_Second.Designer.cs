@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TransactionsModule.Models;
 
 namespace TransactionsModule.Migrations
 {
     [DbContext(typeof(TransactionDbContext))]
-    partial class TransactionDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210610101216_Second")]
+    partial class Second
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -232,19 +234,19 @@ namespace TransactionsModule.Migrations
                         new
                         {
                             Service_ID = 1,
-                            Date_Service_Provided = new DateTime(2021, 6, 10, 15, 45, 36, 362, DateTimeKind.Local).AddTicks(614),
+                            Date_Service_Provided = new DateTime(2021, 6, 10, 15, 42, 16, 103, DateTimeKind.Local).AddTicks(4678),
                             Other_Details = "Other Details 1"
                         },
                         new
                         {
                             Service_ID = 2,
-                            Date_Service_Provided = new DateTime(2021, 6, 10, 15, 45, 36, 362, DateTimeKind.Local).AddTicks(1273),
+                            Date_Service_Provided = new DateTime(2021, 6, 10, 15, 42, 16, 103, DateTimeKind.Local).AddTicks(5527),
                             Other_Details = "Other Details 1"
                         },
                         new
                         {
                             Service_ID = 3,
-                            Date_Service_Provided = new DateTime(2021, 6, 10, 15, 45, 36, 362, DateTimeKind.Local).AddTicks(1292),
+                            Date_Service_Provided = new DateTime(2021, 6, 10, 15, 42, 16, 103, DateTimeKind.Local).AddTicks(5555),
                             Other_Details = "Other Details 1"
                         });
                 });

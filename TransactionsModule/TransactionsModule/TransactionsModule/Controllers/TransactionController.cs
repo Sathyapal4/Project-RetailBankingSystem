@@ -1,5 +1,4 @@
-﻿using log4net;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -11,11 +10,10 @@ namespace TransactionsModule.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Customer")]
+    //[Authorize(Roles = "Customer")]
     public class TransactionController : ControllerBase
     {
         private readonly ITransactionRepository _transactionRepository;
-        private readonly ILog _logger = LogManager.GetLogger(typeof(TransactionController));
 
         public TransactionController(ITransactionRepository transactionRepository)
         {
@@ -36,8 +34,8 @@ namespace TransactionsModule.Controllers
             }
             catch (Exception e)
             {
-                _logger.Error(e.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError);
+                throw e;
             }
         }
         [HttpPost("[action]")]
@@ -52,8 +50,8 @@ namespace TransactionsModule.Controllers
             }
             catch (Exception e)
             {
-                _logger.Error(e.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError);
+                throw e;
             }
         }
         [HttpPost("[action]")]
@@ -68,8 +66,8 @@ namespace TransactionsModule.Controllers
             }
             catch (Exception e)
             {
-                _logger.Error(e.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError);
+                throw e;
             }
         }
         [HttpGet("[action]/{accountId}")]
@@ -84,8 +82,8 @@ namespace TransactionsModule.Controllers
             }
             catch (Exception e)
             {
-                _logger.Error(e.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError);
+                throw e;
             }
         }
 
